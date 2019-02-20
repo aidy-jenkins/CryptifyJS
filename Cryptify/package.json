@@ -1,0 +1,12 @@
+{
+  "name": "cryptify",
+  "version": "0.0.0",
+  "description": "Cryptify",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.14"
+  }
+}
