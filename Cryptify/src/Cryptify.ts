@@ -17,7 +17,7 @@
             await FileManager.downloadFile(filename + '.KEY', rawKey);
         }
         catch (err) {
-            console.log((err && err.message) || err);
+            console.log(err);
         }
     }
 
@@ -33,7 +33,7 @@
             await FileManager.downloadFile(filename.substr(0, filename.lastIndexOf('.')), decrypted_data);
         }
         catch (err) {
-            console.log((err && err.message) || err);
+            console.log(err);
         }
     }
 }
