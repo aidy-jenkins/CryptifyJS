@@ -2,19 +2,20 @@ class FileManager {
     public static readonly UPLOAD_TIMEOUT_MS = 300000; //Five minutes
 
     public static async downloadFile(filename: string, data: ArrayBuffer): Promise<void> {
+        let blob = new Blob([new Uint8Array(data)]);
+        data = null;
+
         if(window["msSaveOrOpenBlob"]) { //Edge
-            window.navigator.msSaveOrOpenBlob(new Blob([new Uint8Array(data)]), filename);
+            window.navigator.msSaveOrOpenBlob(blob, filename);
             return await wait<void>();
         }
         else  { //HTML5
-            let sData = String.fromCharCode(...new Uint8Array(data));
-            data = null; //clear parameter from memory
-            sData = "data:;base64," + btoa(sData); //convert to base 64 data URL
+            let url = URL.createObjectURL(blob);
+            //sData = "data:;base64," + btoa(sData); //convert to base 64 data URL
 
             let anchor = document.createElement('a');
             if(anchor.download !== void 0) {  //HTML5 route
-                anchor.href = sData;
-                sData = null;
+                anchor.href = url;
                 anchor.download = filename;
                 anchor.textContent = "."; //Give non-whitespace content so it is 'clickable'
                 document.body.appendChild(anchor);
@@ -24,7 +25,7 @@ class FileManager {
                 document.body.removeChild(anchor);
             }
             else {
-                window.open(sData); //fallback - filename cannot be provided
+                window.open(url); //fallback - filename cannot be provided
             }
         }
     }
@@ -51,9 +52,6 @@ class FileManager {
 
             return { filename: fUpload.files[0].name, data: result };
 
-        }
-        catch (err) {
-            console.log((err && err.message) || err);
         }
         finally {
             document.body.removeChild(fUpload);
