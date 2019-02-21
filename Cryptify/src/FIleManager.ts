@@ -1,8 +1,8 @@
 class FileManager {
     public static readonly UPLOAD_TIMEOUT_MS = 300000; //Five minutes
 
-    public static async downloadFile(filename: string, data: ArrayBuffer): Promise<void> {
-        let blob = new Blob([new Uint8Array(data)]);
+    public static async downloadFile(filename: string, data: ArrayBuffer | Uint8Array): Promise<void> {
+        let blob = new Blob([data instanceof Uint8Array ? data : new Uint8Array(data)]);
         data = null;
 
         if(window["msSaveOrOpenBlob"]) { //Edge
