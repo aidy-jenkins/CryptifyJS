@@ -13,6 +13,17 @@
     <div>
         <input type="button" onclick="Cryptify.encryptFile();" value="Encrypt" />
         <input type="button" onclick="Cryptify.decryptFile();" value="Decrypt" />
+        <input type="button" onclick="Cryptify.generateSelfDecrypt();" value="Generate Self-decrypting file" />
+    </div>
+    <div>
+        <div>Encryption key</div>
+        <input id="txtKey" type="text" />
+    </div>
+
+    <div id="dvSelfDecrypt" style="display: none;">
+        <input type="text" placeholder="Encryption key" />
+        <input type="button" value="Decrypt" onclick="Cryptify.decryptFile(document.body.dataset['filename']);" />
+
     </div>
 </body>
 </html>
