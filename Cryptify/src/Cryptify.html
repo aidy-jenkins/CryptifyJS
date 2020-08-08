@@ -1,6 +1,8 @@
 ﻿<html>
 <head>
     <title>Cryptify</title>
+
+    <link href="Cryptify.css" rel="stylesheet" />
     
     <script type="text/javascript" src="helper.js"></script>
     <script type="text/javascript" src="FileManager.js"></script>
@@ -11,13 +13,14 @@
         <h2>Cryptify</h2>
     </div>
     <div>
-        <input type="button" onclick="Cryptify.encryptFile();" value="Encrypt" />
-        <input type="button" onclick="Cryptify.decryptFile();" value="Decrypt" />
-        <input type="button" onclick="Cryptify.generateSelfDecrypt();" value="Generate Self-decrypting file" />
+        <input id="btnEncrypt" type="button" onclick="Cryptify.encryptFile();" value="Encrypt" />
+        <input id="btnDecrypt" type="button" onclick="Cryptify.decryptFile();" value="Decrypt" />
+        <input id="btnGenerate" type="button" onclick="Cryptify.generateSelfDecrypt();" value="Generate Self-decrypting file" />
     </div>
     <div>
         <div>Encryption key</div>
-        <input id="txtKey" type="text" />
+        <span id="txtKey"></span>
+        <!-- Used for having a custom key <input id="txtKey" type="text" /> -->
     </div>
 
     <div id="dvSelfDecrypt" style="display: none;">

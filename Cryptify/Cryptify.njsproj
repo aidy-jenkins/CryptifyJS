@@ -6,6 +6,8 @@
     <Name>Cryptify</Name>
     <RootNamespace>Cryptify</RootNamespace>
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
+    <LaunchUrl>src/Cryptify.html</LaunchUrl>
+    <SaveNodeJsSettingsInProjectFile>True</SaveNodeJsSettingsInProjectFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -24,9 +26,9 @@
     <NodejsPort>1337</NodejsPort>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
-    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.7</TypeScriptToolsVersion>
     <EnableTypeScript>true</EnableTypeScript>
-    <StartWebBrowser>true</StartWebBrowser>
+    <StartWebBrowser>True</StartWebBrowser>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,12 +38,15 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="server.ts" />
+    <Content Include="src\Cryptify.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\Cryptify.html" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="src\Cryptify.ts" />
-    <TypeScriptCompile Include="src\FIleManager.ts" />
+    <TypeScriptCompile Include="src\FileManager.ts" />
     <TypeScriptCompile Include="src\helper.ts" />
   </ItemGroup>
   <ItemGroup>
