@@ -2,8 +2,13 @@ class FileManager {
     public static readonly UPLOAD_TIMEOUT_MS = 300000; //Five minutes
 
     public static async downloadFile(filename: string, data: ArrayBuffer | Uint8Array): Promise<void> {
-        let blob = new Blob([data instanceof Uint8Array ? data : new Uint8Array(data)]);
+        let array = data instanceof Uint8Array ? data : new Uint8Array(data);
         data = null;
+        await wait(); //Trying to only keep one copy in memory as much as possible (not guaranteed but browser will eventually try to reclaim dereferenced objects)
+
+        let blob = new Blob([array]);
+        array = null;
+        await wait();
 
         if(window["msSaveOrOpenBlob"]) { //Edge
             window.navigator.msSaveOrOpenBlob(blob, filename);
@@ -31,12 +36,11 @@ class FileManager {
     }
 
     public static async uploadFile(accept = ""): Promise<{ filename: string; data: ArrayBuffer }> {
-        let fUpload = document.createElement("input");
+        let fUpload = document.querySelector("input[type=file]") as HTMLInputElement ?? document.createElement("input");
         try {
             fUpload.type = "file";
             fUpload.accept = accept;
             document.body.appendChild(fUpload);
-            await wait();
             fUpload.click(); //trigger upload dialog
             let e = await Promise.race([
                 new Promise<Event>(r => fUpload.onchange = r),
@@ -45,16 +49,30 @@ class FileManager {
             if (fUpload.files.length < 1)
                 throw new Error("No files selected");
 
+            let filename = fUpload.files[0].name;
+            let file = fUpload.files[0];
+
+            document.body.removeChild(fUpload);
+            fUpload = null; //dereference to allow it to be disposed 
+
             let fr = new FileReader();
-            fr.readAsArrayBuffer(fUpload.files[0]);
+            fr.readAsArrayBuffer(file);
+
+            file = null; //blob will be cleared once no longer needed by FileReader
+
             await new Promise(r => fr.onload = r);
             let result = fr.result as ArrayBuffer;
 
-            return { filename: fUpload.files[0].name, data: result };
+            return { filename: filename, data: result };
 
         }
+        catch (err) {
+            console.error(err);
+            throw err;
+        }
         finally {
-            document.body.removeChild(fUpload);
+            if (fUpload != null)
+                document.body.removeChild(fUpload); //Make sure it gets ditched
         }
     }
 }

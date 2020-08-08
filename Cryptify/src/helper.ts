@@ -14,7 +14,8 @@ function stringFromArrayBuffer(buffer: ArrayBuffer) {
 }
 
 function stringFromUint8Array(arr: Uint8Array) {
-    return String.fromCharCode(...arr);
+    return (Array.prototype.map.call(arr, x => String.fromCharCode(x)) as string[]).join('');
+
 }
 
 function uint8ArrayFromString(str: string) {
