@@ -25,10 +25,26 @@ class Cryptify {
     }
     static decryptFile(filename = null, content = null) {
         return __awaiter(this, void 0, void 0, function* () {
-            let decryption = Encryption.decryptFile(filename, content);
+            let key = document.getElementById("txtKey").value;
+            let decryption = Encryption.decryptFile(filename, key, content);
             content = null;
             let { filename: fName, data } = yield decryption;
             yield FileManager.downloadFile(fName, data);
+        });
+    }
+    static copyKeyToClipboard() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let key = document.getElementById("txtKey").textContent;
+                yield navigator.clipboard.writeText(key);
+                let status = document.getElementById("copyStatus");
+                status.textContent = "Copied!";
+                yield wait(null, 2000);
+                status.textContent = "";
+            }
+            catch (err) {
+                console.error(err);
+            }
         });
     }
     static createPageWrapper() {
@@ -49,6 +65,16 @@ class Cryptify {
             })));
         });
     }
+    static packageStyles() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield Promise.all(Array.from(document.getElementsByTagName("link")).filter(x => x.rel === "stylesheet").map((stylesheet) => __awaiter(this, void 0, void 0, function* () {
+                let style = document.createElement("style");
+                style.type = "text/css";
+                style.textContent = yield fetch(stylesheet.href).then(x => x.text());
+                return style;
+            })));
+        });
+    }
     static generateSelfDecrypt(saveKeyfile = false) {
         return __awaiter(this, void 0, void 0, function* () {
             let { filename, content } = yield (() => __awaiter(this, void 0, void 0, function* () {
@@ -63,9 +89,9 @@ class Cryptify {
                 spData.textContent = btoa(stringFromArrayBuffer(data));
                 data = null;
                 body.appendChild(dvSelfDecrypt);
-                let scriptPackage = yield this.packageScripts();
-                for (let script of scriptPackage)
-                    head.appendChild(script);
+                let packages = [...yield this.packageScripts(), ...yield this.packageStyles()];
+                for (let item of packages)
+                    head.appendChild(item);
                 let scrip = document.createElement("script");
                 scrip.type = "text/javascript";
                 scrip.textContent = `document.getElementById('btnDecrypt').onclick = e => Cryptify.selfDecrypt();`;
@@ -74,6 +100,8 @@ class Cryptify {
             }))();
             let data = uint8ArrayFromString(content);
             content = null;
+            let dvKey = document.getElementById("dvKey");
+            dvKey.style.display = "";
             try {
                 yield FileManager.downloadFile(filename + ".encrypted.html", data);
             }
