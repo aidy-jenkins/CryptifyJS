@@ -5,6 +5,7 @@
     <link href="Cryptify.css" rel="stylesheet" />
     
     <script type="text/javascript" src="helper.js"></script>
+    <script type="text/javascript" src="Encryption.js"></script>
     <script type="text/javascript" src="FileManager.js"></script>
     <script type="text/javascript" src="Cryptify.js"></script>
 </head>
@@ -20,13 +21,13 @@
     <div>
         <div>Encryption key</div>
         <span id="txtKey"></span>
-        <!-- Used for having a custom key <input id="txtKey" type="text" /> -->
     </div>
 
     <div id="dvSelfDecrypt" style="display: none;">
-        <input type="text" placeholder="Encryption key" />
-        <input type="button" value="Decrypt" onclick="Cryptify.decryptFile(document.body.dataset['filename']);" />
-
+        <span id="spData" data-filename="" style="display: none;"></span>
+        <span>Encryption key: </span>
+        <input type="text" id="txtKey" />
+        <input type="button" id="btnDecrypt" value="Decrypt file" />
     </div>
 </body>
 </html>
