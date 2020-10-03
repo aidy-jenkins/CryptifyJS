@@ -46,6 +46,9 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="src\Cryptify.ts" />
+    <TypeScriptCompile Include="src\Encryption.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\FileManager.ts" />
     <TypeScriptCompile Include="src\helper.ts" />
   </ItemGroup>
