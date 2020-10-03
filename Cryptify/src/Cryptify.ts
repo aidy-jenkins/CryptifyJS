@@ -20,11 +20,30 @@
     }
 
     public static async decryptFile(filename = null as string, content = null as Uint8Array | ArrayBuffer) {
-        let decryption = Encryption.decryptFile(filename, content);
+        let key = (document.getElementById("txtKey") as HTMLInputElement).value;
+        let decryption = Encryption.decryptFile(filename, key, content);
         content = null;
 
         let { filename: fName, data } = await decryption;
         await FileManager.downloadFile(fName, data);
+    }
+
+    public static async copyKeyToClipboard() {
+        try {
+            let key = (document.getElementById("txtKey") as HTMLSpanElement).textContent;
+
+            await navigator.clipboard.writeText(key);
+
+            let status = document.getElementById("copyStatus") as HTMLSpanElement;
+            status.textContent = "Copied!";
+
+            await wait(null, 2000);
+
+            status.textContent = "";
+        }
+        catch(err) {
+            console.error(err);
+        }
     }
 
     protected static createPageWrapper() {
@@ -43,6 +62,15 @@
             script.type = "text/javascript";
             script.textContent = await fetch(scr.src).then(x => x.text());
             return script;
+        }));
+    }
+
+    protected static async packageStyles() {
+        return await Promise.all(Array.from(document.getElementsByTagName("link")).filter(x => x.rel === "stylesheet").map(async stylesheet => {
+            let style = document.createElement("style");
+            style.type = "text/css";
+            style.textContent = await fetch(stylesheet.href).then(x => x.text());
+            return style;
         }));
     }
 
@@ -67,10 +95,10 @@
             data = null;
 
             body.appendChild(dvSelfDecrypt);
-
-            let scriptPackage = await this.packageScripts();
-            for(let script of scriptPackage)
-                head.appendChild(script);
+            
+            let packages = [ ...await this.packageScripts(), ...await this.packageStyles()];
+            for(let item of packages)
+                head.appendChild(item);
 
             let scrip = document.createElement("script");
             scrip.type = "text/javascript";
@@ -81,6 +109,9 @@
 
         let data = uint8ArrayFromString(content);
         content = null;
+
+        let dvKey = document.getElementById("dvKey");
+        dvKey.style.display = "";
 
         try {
             await FileManager.downloadFile(filename + ".encrypted.html", data);

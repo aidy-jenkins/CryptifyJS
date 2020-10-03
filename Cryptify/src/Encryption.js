@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var Encryption;
 (function (Encryption) {
-    const getAlgorithmParameters = () => ({ name: "AES-CTR", counter: crypto.getRandomValues(new Uint8Array(16)), length: 128 });
+    const getAlgorithmParameters = (counter) => ({ name: "AES-CTR", counter: (counter !== null && counter !== void 0 ? counter : crypto.getRandomValues(new Uint8Array(16))), length: 128 });
     Encryption.encryptFile = (filenameAppendix = null) => __awaiter(this, void 0, void 0, function* () {
         try {
             let algorithm = getAlgorithmParameters();
@@ -18,52 +18,37 @@ var Encryption;
             let encrypted_data = yield crypto.subtle.encrypt(algorithm, key, data);
             let sKey = btoa(stringFromArrayBuffer(yield crypto.subtle.exportKey("raw", key)));
             sKey += ';' + btoa(stringFromUint8Array(algorithm.counter));
+            sKey = btoa(sKey);
             if (filenameAppendix)
                 filename += filenameAppendix;
             return { data: encrypted_data, filename, key: sKey };
         }
         catch (err) {
             console.error(err);
+            throw new TypeError("Failed to encrypt file");
         }
     });
-    Encryption.decryptFile = (filename = null, content = null) => __awaiter(this, void 0, void 0, function* () {
+    Encryption.decryptFile = (filename = null, key, content) => __awaiter(this, void 0, void 0, function* () {
+        if (!key || !content)
+            throw new TypeError("Could not decrypt file from the parameters provided");
         try {
-            let algorithm = getAlgorithmParameters();
-            let rawKey;
-            let counter;
-            let sRawKey = document.getElementById("txtKey").value;
-            if (sRawKey)
-                rawKey = uint8ArrayFromString(sRawKey.trim());
-            else {
-                let { data } = yield FileManager.uploadFile(".KEY");
-                rawKey = new Uint8Array(data);
-            }
-            let [sKey, sCounter] = stringFromUint8Array(rawKey).split(';');
-            sKey = atob(sKey);
-            sCounter = atob(sCounter);
-            rawKey = uint8ArrayFromString(sKey);
-            counter = uint8ArrayFromString(sCounter);
-            algorithm.counter = counter;
-            if (!content) {
-                if (filename)
-                    content = yield (yield fetch(filename)).arrayBuffer();
-                else {
-                    ({ data: content, filename } = yield FileManager.uploadFile(".ENCRYPTED"));
-                }
-            }
-            else if (!filename) {
-                filename = "decryptedfile.ENCRYPTED";
-            }
-            let key = yield crypto.subtle.importKey("raw", rawKey, algorithm, true, ["encrypt", "decrypt"]);
-            let decrypted_data = yield crypto.subtle.decrypt(algorithm, key, content);
+            key = atob(key);
+            let [rawKey, counter] = key.split(';').map(atob).map(uint8ArrayFromString);
+            let algorithm = getAlgorithmParameters(counter);
+            let cryptoKey = yield crypto.subtle.importKey("raw", rawKey, algorithm, true, ["encrypt", "decrypt"]);
+            let decryptedData = yield crypto.subtle.decrypt(algorithm, cryptoKey, content);
             content = null;
             yield wait();
-            if (filename.includes("ENCRYPTED"))
+            if (!filename) {
+                filename = "decryptedfile";
+            }
+            else if (filename.includes("ENCRYPTED"))
                 filename = filename.substr(0, filename.indexOf("ENCRYPTED"));
-            return { filename: filename, data: decrypted_data };
+            return { filename: filename, data: decryptedData };
         }
         catch (err) {
-            console.log(err);
+            console.error(err);
+            throw new TypeError("Failed to decrypt file");
         }
     });
 })(Encryption || (Encryption = {}));

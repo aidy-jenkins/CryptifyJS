@@ -14,13 +14,14 @@
         <h2>Cryptify</h2>
     </div>
     <div>
-        <input id="btnEncrypt" type="button" onclick="Cryptify.encryptFile();" value="Encrypt" />
-        <input id="btnDecrypt" type="button" onclick="Cryptify.decryptFile();" value="Decrypt" />
         <input id="btnGenerate" type="button" onclick="Cryptify.generateSelfDecrypt();" value="Generate Self-decrypting file" />
     </div>
-    <div>
+    <div id="dvKey" style="display:none;">
         <div>Encryption key</div>
         <span id="txtKey"></span>
+        <input type="button" id="btnCopy" value="Copy to clipboard" onclick="Cryptify.copyKeyToClipboard();"  />
+        <span id="copyStatus"></span>
+        
     </div>
 
     <div id="dvSelfDecrypt" style="display: none;">
