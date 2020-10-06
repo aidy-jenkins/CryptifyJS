@@ -16,11 +16,11 @@ var Encryption;
         try {
             let algorithm = getAlgorithmParameters();
             let key = (yield crypto.subtle.generateKey({ name: algorithm.name, length: algorithm.length }, true, ["encrypt", "decrypt"]));
-            let encrypted_data = yield crypto.subtle.encrypt(algorithm, key, data);
+            let encryptedData = yield crypto.subtle.encrypt(algorithm, key, data);
             let sKey = btoa(stringFromArrayBuffer(yield crypto.subtle.exportKey("raw", key)));
             sKey += ';' + btoa(stringFromUint8Array(algorithm.counter));
             sKey = btoa(sKey);
-            return { data: encrypted_data, key: sKey };
+            return { data: encryptedData, key: sKey };
         }
         catch (err) {
             console.error(err);
