@@ -1,27 +1,47 @@
 ﻿<html>
+
 <head>
     <title>Cryptify</title>
 
     <link href="Cryptify.css" rel="stylesheet" />
-    
+
+    <script type="text/javascript" src="../node_modules/jszip/dist/jszip.min.js"></script>
     <script type="text/javascript" src="helper.js"></script>
     <script type="text/javascript" src="Encryption.js"></script>
     <script type="text/javascript" src="FileManager.js"></script>
+    <script type="text/javascript" src="Compression.js"></script>
     <script type="text/javascript" src="Cryptify.js"></script>
 </head>
+
 <body>
     <div id="dvHeader">
         <h2>Cryptify</h2>
     </div>
     <div>
-        <input id="btnGenerate" type="button" onclick="Cryptify.generateSelfDecrypt();" value="Generate Self-decrypting file" />
+        Encrypt files right in the browser, no installation needed
     </div>
+    <div>
+        <p>
+            <input id="btnGenerate" type="button" onclick="Cryptify.generateSelfDecrypt();"
+                value="Generate Self-decrypting file" />
+            <input id="chkCompress" type="checkbox" value="Compress" checked="checked" /> Use compression (smaller file
+            but takes longer)
+        </p>
+        <p>
+            <span id="lblStatus"></span>
+        </p>
+    </div>
+    <p></p>
     <div id="dvKey" style="display:none;">
-        <div>Encryption key</div>
-        <span id="txtKey"></span>
-        <input type="button" id="btnCopy" value="Copy to clipboard" onclick="Cryptify.copyKeyToClipboard();"  />
-        <span id="copyStatus"></span>
-        
+        <div>
+            Encryption key
+            <input type="button" id="btnCopy" value="Copy to clipboard" onclick="Cryptify.copyKeyToClipboard();" />
+            <span id="copyStatus"></span>
+        </div>
+        <p />
+        <div>
+            <span id="txtKey"></span>
+        </div>
     </div>
 
     <div id="dvSelfDecrypt" style="display: none;">
@@ -29,6 +49,111 @@
         <span>Encryption key: </span>
         <input type="text" id="txtKey" />
         <input type="button" id="btnDecrypt" value="Decrypt file" />
+        <span id="lblStatus"></span>
+        <div>
+            This file was created using <a href="https://github.aidyj.uk/">Cryptify</a> - Encrypt your own files for
+            free
+        </div>
+    </div>
+
+    <div id="faq">
+        <h2>FAQ</h2>
+        <p class="question">
+            What is Cryptify?
+        </p>
+        <p class="answer">
+        <ul>
+            <li>
+                Cryptify is an easy to use tool for encrypting files without installing any extra software
+            </li>
+        </ul>
+        </p>
+
+        <p class="question">
+            Is Cryptify secure?
+        </p>
+        <p class="answer">
+        <ul>
+            <li>
+                Your files are encrypted within the browser and not stored on our server, in fact, your data never
+                leaves your device
+            </li>
+        </ul>
+        </p>
+
+        <p class="question">
+            What would I use Cryptify for?
+        </p>
+        <p class="answer">
+        <ul>
+            <li>
+                You can use Cryptify to make sure sensitive data is secure before sending it to someone else or just to
+                secure data on your own computer
+            </li>
+        </ul>
+        </p>
+
+        <p class="question">
+            How do I use Cryptify?
+        </p>
+        <p class="answer">
+        <ul>
+            <li>
+                Click the button, choose a file you want to encrypt and away you go - just make sure you save the
+                encryption key or you won't be able to change your file back!
+                <p />
+            </li>
+            <li>
+                You should store or send your encryption key separately to the encrypted data, otherwise anyone who can
+                see the data could potentially decrypt it
+                <p />
+            </li>
+            <li>
+                For example, you could e-mail an encrypted file to your friend and send them the key via text, which
+                would make it harder for someone else to steal your data
+            </li>
+        </ul>
+        </p>
+
+        <p class="question">
+            I downloaded an encrypted file from Cryptify, how do I get the original back?
+        </p>
+        <p class="answer">
+        <ul>
+            <li>
+                Just open up the html file that you downloaded after encrypting your file, pop in the encryption key you
+                were given and your file will come back automagically
+            </li>
+        </ul>
+        </p>
+
+        <p class="question">
+            Is Cryptify open source?
+        </p>
+        <p class="answer">
+        <ul>
+            <li>
+                Actually, yes ... head over to the <a href="https://github.com/ADTJ/CryptifyJS">Cryptify github page</a>
+                if you
+                want to know more
+            </li>
+        </ul>
+        </p>
+
+        <p class="question">
+            Does Cryptify have any external dependencies?
+        </p>
+        <p class="answer">
+        <ul>
+            <li>
+                Yes, if you enable compression Cryptify makes use of <a href="https://stuk.github.io/jszip/">Stuart
+                    Knightley's fantastic JSZip library</a> (under the MIT licence)
+            </li>
+        </ul>
+        </p>
+
+
     </div>
 </body>
+
 </html>

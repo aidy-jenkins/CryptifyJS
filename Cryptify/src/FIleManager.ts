@@ -1,32 +1,31 @@
 class FileManager {
     public static readonly UPLOAD_TIMEOUT_MS = 300000; //Five minutes
 
-    public static async downloadFile(filename: string, data: ArrayBuffer | Uint8Array): Promise<void> {
-        let array = data instanceof Uint8Array ? data : new Uint8Array(data);
-        data = null;
-        await wait(); //Trying to only keep one copy in memory as much as possible (not guaranteed but browser will eventually try to reclaim dereferenced objects)
-
-        let blob = new Blob([array]);
-        array = null;
-        await wait();
-
-        if(window["msSaveOrOpenBlob"]) { //Edge
-            window.navigator.msSaveOrOpenBlob(blob, filename);
-            return await wait<void>();
+    public static async downloadFile(filename: string, data: Blob | ArrayBuffer | Uint8Array): Promise<void> {
+        if(!(data instanceof Blob)) {
+            data = new Blob([data]);
+            await wait(); 
+            //Trying to only keep one copy in memory as much as possible in case the file is quite large and resources are low
+            //Forcing an async call here is not guaranteed to prevent "Out of Memory" but should reduce likelihood
         }
-        else  { //HTML5
-            let url = URL.createObjectURL(blob);
-            //sData = "data:;base64," + btoa(sData); //convert to base 64 data URL
 
+        if(window.navigator["msSaveOrOpenBlob"]) { //IE & Edge
+            await wait(); //Force save to be async for consistency with HTML5 path
+            window.navigator.msSaveOrOpenBlob(data, filename);
+            return;
+        }
+        else {
+            let url = URL.createObjectURL(data);
+            
             let anchor = document.createElement('a');
             if(anchor.download !== void 0) {  //HTML5 route
                 anchor.href = url;
                 anchor.download = filename;
-                anchor.textContent = "."; //Give non-whitespace content so it is 'clickable'
+                anchor.textContent = ".";
                 document.body.appendChild(anchor);
-                await wait();
+                await wait(); //Give non-whitespace content and load anchor into DOM so it can be 'clicked'
                 anchor.click();
-                await wait();
+                await wait(); //Allow DOM click event to be handled before removing
                 document.body.removeChild(anchor);
             }
             else {
@@ -35,8 +34,8 @@ class FileManager {
         }
     }
 
-    public static async uploadFile(accept = ""): Promise<{ filename: string; data: ArrayBuffer }> {
-        let fUpload = document.querySelector("input[type=file]") as HTMLInputElement ?? document.createElement("input");
+    public static async uploadFile({ accept = "", onFileSelect = null as (e: Event) => void } = {}): Promise<{ filename: string; data: ArrayBuffer }> {
+        let fUpload = document.createElement("input");
         try {
             fUpload.type = "file";
             fUpload.accept = accept;
@@ -48,6 +47,9 @@ class FileManager {
             ]);
             if (fUpload.files.length < 1)
                 throw new Error("No files selected");
+
+            if(onFileSelect)
+                onFileSelect(e);
 
             let filename = fUpload.files[0].name;
             let file = fUpload.files[0];
