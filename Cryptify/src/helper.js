@@ -1,7 +1,9 @@
-function wait(callback, timeout, ...args) {
+function wait(firstArg, timeout, ...args) {
+    var _a;
+    let callback = (_a = (typeof firstArg === "number" ? void (timeout = firstArg) : firstArg), (_a !== null && _a !== void 0 ? _a : (() => { })));
     return new Promise((resolve, reject) => setTimeout(() => {
         try {
-            resolve((callback || (() => { })).apply(null, ...args));
+            resolve(callback.apply(null, ...args));
         }
         catch (e) {
             reject(e);

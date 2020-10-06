@@ -5,3 +5,14 @@ html {
 input[type=file] {
     display: none;
 }
+
+.question {
+    font-weight: bold;
+}
+.answer li {
+    font-style: italic;
+}
+
+#faq {
+    margin-top: 75px;
+}

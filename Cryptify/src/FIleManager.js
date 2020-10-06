@@ -10,28 +10,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 class FileManager {
     static downloadFile(filename, data) {
         return __awaiter(this, void 0, void 0, function* () {
-            let array = data instanceof Uint8Array ? data : new Uint8Array(data);
-            data = null;
-            yield wait(); //Trying to only keep one copy in memory as much as possible (not guaranteed but browser will eventually try to reclaim dereferenced objects)
-            let blob = new Blob([array]);
-            array = null;
-            yield wait();
-            if (window["msSaveOrOpenBlob"]) { //Edge
-                window.navigator.msSaveOrOpenBlob(blob, filename);
-                return yield wait();
+            if (!(data instanceof Blob)) {
+                data = new Blob([data]);
+                yield wait();
+                //Trying to only keep one copy in memory as much as possible in case the file is quite large and resources are low
+                //Forcing an async call here is not guaranteed to prevent "Out of Memory" but should reduce likelihood
             }
-            else { //HTML5
-                let url = URL.createObjectURL(blob);
-                //sData = "data:;base64," + btoa(sData); //convert to base 64 data URL
+            if (window.navigator["msSaveOrOpenBlob"]) { //IE & Edge
+                yield wait(); //Force save to be async for consistency with HTML5 path
+                window.navigator.msSaveOrOpenBlob(data, filename);
+                return;
+            }
+            else {
+                let url = URL.createObjectURL(data);
                 let anchor = document.createElement('a');
                 if (anchor.download !== void 0) { //HTML5 route
                     anchor.href = url;
                     anchor.download = filename;
-                    anchor.textContent = "."; //Give non-whitespace content so it is 'clickable'
+                    anchor.textContent = ".";
                     document.body.appendChild(anchor);
-                    yield wait();
+                    yield wait(); //Give non-whitespace content and load anchor into DOM so it can be 'clicked'
                     anchor.click();
-                    yield wait();
+                    yield wait(); //Allow DOM click event to be handled before removing
                     document.body.removeChild(anchor);
                 }
                 else {
@@ -40,10 +40,9 @@ class FileManager {
             }
         });
     }
-    static uploadFile(accept = "") {
-        var _a;
+    static uploadFile({ accept = "", onFileSelect = null } = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            let fUpload = (_a = document.querySelector("input[type=file]"), (_a !== null && _a !== void 0 ? _a : document.createElement("input")));
+            let fUpload = document.createElement("input");
             try {
                 fUpload.type = "file";
                 fUpload.accept = accept;
@@ -55,6 +54,8 @@ class FileManager {
                 ]);
                 if (fUpload.files.length < 1)
                     throw new Error("No files selected");
+                if (onFileSelect)
+                    onFileSelect(e);
                 let filename = fUpload.files[0].name;
                 let file = fUpload.files[0];
                 document.body.removeChild(fUpload);
