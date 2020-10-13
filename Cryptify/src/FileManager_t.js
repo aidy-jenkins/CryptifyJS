@@ -79,4 +79,4 @@ class FileManager {
     }
 }
 FileManager.UPLOAD_TIMEOUT_MS = 300000; //Five minutes
-//# sourceMappingURL=FileManager.js.map
+//# sourceMappingURL=FIleManager.js.map
