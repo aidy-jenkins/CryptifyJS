@@ -9,6 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 /** Main controller class to manage the page */
 class Cryptify {
+    static isCompressable(filename) {
+        return !this.COMPRESSION_BLACKLIST.includes(this.getFileExtension(filename));
+    }
+    static getFileExtension(filename) {
+        let parts = filename.split('.');
+        let extension = parts[parts.length - 1];
+        return extension;
+    }
     static generateSelfDecrypt(saveKeyfile = false) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -18,8 +26,9 @@ class Cryptify {
                     dvSelfDecrypt = dvSelfDecrypt.cloneNode(true);
                     dvSelfDecrypt.style.display = "";
                     let spData = dvSelfDecrypt.querySelector("#spData");
-                    let compress = document.getElementById("chkCompress").checked;
                     let { data, filename } = yield FileManager.uploadFile({ onFileSelect: () => this.updateStatus("Uploading file") });
+                    let compress = document.getElementById("chkCompress").checked;
+                    compress = compress && this.isCompressable(filename);
                     if (compress) {
                         yield this.updateStatus("Compressing - optimising for best file size");
                         data = yield Compression.compress(data, "arraybuffer", { base64: true });
@@ -149,4 +158,15 @@ class Cryptify {
     }
 }
 Cryptify.DEFAULT_DOWNLOAD_FILENAME = "decryptedfile";
+Cryptify.COMPRESSION_BLACKLIST = [
+    "zip",
+    "rar",
+    "7z",
+    "gz",
+    "mp4",
+    "mp3",
+    "mpeg",
+    "jpg",
+    "jpeg"
+];
 //# sourceMappingURL=Cryptify.js.map

@@ -2,6 +2,29 @@
 class Cryptify {
     protected static readonly DEFAULT_DOWNLOAD_FILENAME = "decryptedfile";
 
+    protected static readonly COMPRESSION_BLACKLIST = [
+        "zip",
+        "rar",
+        "7z",
+        "gz",
+        "mp4",
+        "mp3",
+        "mpeg",
+        "jpg",
+        "jpeg"
+    ];
+
+    protected static isCompressable(filename: string) {
+        return !this.COMPRESSION_BLACKLIST.includes(this.getFileExtension(filename));
+    }
+
+    protected static getFileExtension(filename: string) {
+        let parts = filename.split('.');
+        let extension = parts[parts.length - 1];
+        return extension;
+
+    }
+
     public static async generateSelfDecrypt(saveKeyfile = false) {
         try {
             let { filename, content } = await (async () => {
@@ -13,9 +36,12 @@ class Cryptify {
 
                 dvSelfDecrypt.style.display = "";
                 let spData = dvSelfDecrypt.querySelector("#spData") as HTMLSpanElement;
-                let compress = (document.getElementById("chkCompress") as HTMLInputElement).checked;
+                
                 
                 let { data, filename } = await FileManager.uploadFile({ onFileSelect: () => this.updateStatus("Uploading file") });
+                
+                let compress = (document.getElementById("chkCompress") as HTMLInputElement).checked;
+                compress = compress && this.isCompressable(filename);
                 
                 if(compress) {
                     await this.updateStatus("Compressing - optimising for best file size");
